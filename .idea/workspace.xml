@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d80c82fb-e480-419a-a5e7-d2f3988fd2a9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py" beforeDir="false" afterPath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py" beforeDir="false" afterPath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,35 +27,35 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="27" />
+          <entry key="py" value="33" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="27" />
+          <entry key="Python" value="33" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="Python Console" value="13" />
-          <entry key="py" value="217" />
+          <entry key="Python Console" value="19" />
+          <entry key="py" value="835" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="230" />
+          <entry key="Python" value="854" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5169628">
+    <splitter split-orientation="horizontal" split-proportion="0.543888">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/project_template.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="828">
+                <state relative-caret-position="352">
                   <caret line="67" column="29" selection-start-line="67" selection-start-column="29" selection-end-line="67" selection-end-column="29" />
                   <folding>
                     <element signature="e#40#58#0" expanded="true" />
@@ -61,44 +64,28 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="419">
-                  <caret line="78" selection-start-line="78" selection-end-line="78" />
+                <state relative-caret-position="486">
+                  <caret line="96" column="71" selection-start-line="96" selection-start-column="71" selection-end-line="96" selection-end-column="71" />
                   <folding>
                     <element signature="e#22#40#0" expanded="true" />
+                    <marker date="1536617002117" expanded="true" signature="2080:2142" ph="..." />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file:///opt/ros/kinetic/lib/python2.7/dist-packages/rospy/core.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="329">
-                  <caret line="356" selection-start-line="356" selection-end-line="356" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="478">
-                  <caret line="86" column="40" lean-forward="true" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
+                <state relative-caret-position="252">
+                  <caret line="74" column="55" lean-forward="true" selection-start-line="74" selection-start-column="55" selection-end-line="74" selection-end-column="55" />
                   <folding>
                     <element signature="e#42#57#0" expanded="true" />
+                    <marker date="1536617057969" expanded="true" signature="1229:1717" ph="..." />
                   </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file:///usr/lib/python2.7/re.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="275">
-                  <caret line="233" column="24" selection-start-line="233" selection-start-column="24" selection-end-line="233" selection-end-column="24" />
                 </state>
               </provider>
             </entry>
@@ -146,10 +133,34 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="252">
-                  <caret line="33" column="24" selection-start-line="33" selection-start-column="24" selection-end-line="33" selection-end-column="24" />
+                <state relative-caret-position="212">
+                  <caret line="103" column="18" lean-forward="true" selection-start-line="103" selection-start-column="18" selection-end-line="103" selection-end-column="18" />
                   <folding>
                     <element signature="e#40#58#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pcl_helper.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="419">
+                  <caret line="127" selection-start-line="127" selection-end-line="127" />
+                  <folding>
+                    <element signature="e#228#240#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/pcl_helper.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-417">
+                  <caret line="98" column="25" selection-start-line="98" selection-start-column="16" selection-end-line="98" selection-end-column="25" />
+                  <folding>
+                    <element signature="e#228#240#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -162,6 +173,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>message_converter</find>
+      <find>g_pcl_sub</find>
       <find>.make</find>
     </findStrings>
   </component>
@@ -175,16 +187,36 @@
         <option value="$PROJECT_DIR$/../junk/AAAp3check/pr2_robot/scripts/project.py" />
         <option value="$PROJECT_DIR$/../RoboND-Perception-Exercises/catkin_ws3/src/sensor_stick/scripts/check.py" />
         <option value="$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/check.py" />
-        <option value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py" />
-        <option value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py" />
         <option value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py" />
+        <option value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py" />
+        <option value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="3495" />
-    <option name="width" value="2265" />
+    <option name="width" value="2270" />
     <option name="height" value="1885" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State />
+          <State>
+            <id>General</id>
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>PyPep8NamingInspection</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -258,7 +290,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -366,8 +398,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.pclproc" />
         <item itemvalue="Python.check" />
+        <item itemvalue="Python.pclproc" />
         <item itemvalue="Python.segmentation (1)" />
       </list>
     </recent_temporary>
@@ -395,12 +427,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="3495" y="0" width="2265" height="1885" extended-state="0" />
+    <frame x="3495" y="0" width="2270" height="1885" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16501799" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16464782" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32960564" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22542672" />
@@ -427,11 +460,6 @@
           <url>file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/p3main.py</url>
           <line>3</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -462,16 +490,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/check.py" />
-    <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/project_template.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1926">
-          <caret line="107" selection-start-line="107" selection-end-line="107" />
-          <folding>
-            <element signature="e#40#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/p3main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2178">
@@ -489,13 +507,6 @@
           <folding>
             <element signature="e#40#58#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="751" selection-start-line="751" selection-end-line="751" />
         </state>
       </provider>
     </entry>
@@ -534,41 +545,78 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.2/system/python_stubs/-1247972723/pcl/_pcl/PointCloud_PointXYZRGB.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="122" column="8" selection-start-line="122" selection-start-column="8" selection-end-line="122" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/pcl_helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="-417">
+          <caret line="98" column="25" selection-start-line="98" selection-start-column="16" selection-end-line="98" selection-end-column="25" />
           <folding>
             <element signature="e#228#240#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py">
+    <entry file="file://$PROJECT_DIR$/catkin_ws/src/RoboND-Perception-Project/pr2_robot/scripts/project_template.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="67" column="29" selection-start-line="67" selection-start-column="29" selection-end-line="67" selection-end-column="29" />
+          <folding>
+            <element signature="e#40#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pcl_helper.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="419">
-          <caret line="78" selection-start-line="78" selection-end-line="78" />
+          <caret line="127" selection-start-line="127" selection-end-line="127" />
           <folding>
-            <element signature="e#22#40#0" expanded="true" />
+            <element signature="e#228#240#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="749" selection-start-line="749" selection-end-line="749" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="212">
+          <caret line="103" column="18" lean-forward="true" selection-start-line="103" selection-start-column="18" selection-end-line="103" selection-end-column="18" />
+          <folding>
+            <element signature="e#40#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/pclproc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="478">
-          <caret line="86" column="40" lean-forward="true" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
+        <state relative-caret-position="252">
+          <caret line="74" column="55" lean-forward="true" selection-start-line="74" selection-start-column="55" selection-end-line="74" selection-end-column="55" />
           <folding>
             <element signature="e#42#57#0" expanded="true" />
+            <marker date="1536617057969" expanded="true" signature="1229:1717" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/check.py">
+    <entry file="file://$PROJECT_DIR$/catkin_ws/src/sensor_stick/scripts/segmentation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="33" column="24" selection-start-line="33" selection-start-column="24" selection-end-line="33" selection-end-column="24" />
+        <state relative-caret-position="486">
+          <caret line="96" column="71" selection-start-line="96" selection-start-column="71" selection-end-line="96" selection-end-column="71" />
           <folding>
-            <element signature="e#40#58#0" expanded="true" />
+            <element signature="e#22#40#0" expanded="true" />
+            <marker date="1536617002117" expanded="true" signature="2080:2142" ph="..." />
           </folding>
         </state>
       </provider>

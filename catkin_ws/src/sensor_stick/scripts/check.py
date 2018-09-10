@@ -60,6 +60,9 @@ def pcl_callback(pcl_msg):
 
     # TODO: Convert ROS msg to PCL data
     pcl_data = ros_to_pcl(pcl_msg)
+    msgPCL = pcl_to_ros(pcl_data)
+    pcl_objects_pub.publish(msgPCL)
+    return
 
     # TODO: Voxel Grid Downsampling
     # Create a VoxelGrid filter object for our input point cloud

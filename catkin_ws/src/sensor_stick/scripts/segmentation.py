@@ -36,6 +36,8 @@ import pclproc
 #====================== GLOBALS =====================
 # Clearly this module wants to be a class
 g_pcl_sub = None
+
+g_pcl_debug_pub = None
 g_pcl_objects_pub = None
 g_pcl_table_pub = None
 g_pcl_cluster_pub = None
@@ -48,7 +50,7 @@ g_encoder = None
 g_scaler = None
 
 g_callBackCount = -1
-g_callBackSkip = 40 # How many callbacks to skip until actual processing. Default is 0
+g_callBackSkip =  40# How many callbacks to skip until actual processing. Default is 0
 
 # For debug testing only
 g_doRunRosNode = True # For invoking RunRosNode() when run from pycharm
@@ -63,32 +65,49 @@ def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
     return get_normals_prox(cloud).cluster
 
+# --------------------------------- Debug_Publish()
+def Debug_Publish(pclIn):
+    pclpcIn = pcl_helper.XYZ_to_XYZRGB(pclIn, (0,255,0))
+    msgPCL = pcl_helper.pcl_to_ros(pclpcIn)
+    g_pcl_debug_pub.publish(msgPCL)
+
 #--------------------------------- ProcessPCL()
 def Process_rawPCL(pclpcRawIn):
-
     DebugDumpMsgPCL(pclpcRawIn)
-
     pclRecs = [] # For dev/debug display. Container for point cloud records: tuple (pclObj, pclName# )
-
     pclRecs.append((pclpcRawIn, "pclpcRawIn"))
+
 
     pclRecsDownSampled = pclproc.PCLProc_DownSampleVoxels(pclpcRawIn)
     pclRecs += pclRecsDownSampled
     pclpcDownSampled, pclpcDownSampledName = pclRecsDownSampled[0]
 
-    pclproc.PCLProc_Noise(pclRecsDownSampled)
+    # Region of Interest: PassThrough Filter
+    recsPassThruZ = pclproc.PCLProc_PassThrough(pclpcDownSampled, 'z', 0.6, 1.1)
+    pclRecs += recsPassThruZ
+    pclpcPassZ = recsPassThruZ[0][0]
 
-    # PassThrough Filter
-    pclRecsRansac = pclproc.PCLProc_Ransac(pclpcDownSampled)
+    recsPassThruY = pclproc.PCLProc_PassThrough(pclpcPassZ, 'y', -0.5, 0.5)
+    pclRecs += recsPassThruY
+    pclpcPassY = recsPassThruY[0][0]
+
+    # RANSAC Table/Object separation
+    pclRecsRansac = pclproc.PCLProc_Ransac(pclpcPassY)
     pclRecs += pclRecsRansac
-
-    # Extract inliers and outliers
-    pclpcPassZ, pclpcPassZIn, pclpcPassZOut = pclRecsRansac[0][0], pclRecsRansac[1][0], pclRecsRansac[2][0]
+    pclpcPassZIn, pclpcPassZOut = pclRecsRansac[0][0], pclRecsRansac[1][0]
     pclpcTable, pclpcObjects = pclpcPassZIn, pclpcPassZOut # Rename for clarity
+
+    # Noise reduction
+    pclpRecsNoNoise  = pclproc.PCLProc_Noise(pclpcObjects)
+    pclRecs += pclpRecsNoNoise
+    pclpNoColorNoNoise = pclpRecsNoNoise[0][0]
+    Debug_Publish(pclpNoColorNoNoise)
+
 
     # Euclidean Clustering
     pclpObjectsNoColor = pcl_helper.XYZRGB_to_XYZ(pclpcObjects)
-    clusterIndices, pclpcClusters = pclproc.PCLProc_ExtractClusters(pclpObjectsNoColor)
+    #clusterIndices, pclpcClusters = pclproc.PCLProc_ExtractClusters(pclpObjectsNoColor)
+    clusterIndices, pclpClusters = pclproc.PCLProc_ExtractClusters(pclpNoColorNoNoise)
 
     labelRecs = []
 
@@ -113,7 +132,7 @@ def Process_rawPCL(pclpcRawIn):
         #label_pos[2] += 0.3
         labelRecs.append((label, label_pos, index))
 
-    return labelRecs, pclpcObjects, pclpcTable, pclpcClusters
+    return labelRecs, pclpcObjects, pclpcTable, pclpClusters
 
 #--------------------------------- CB_msgPCL()
 def CB_msgPCL(msgPCL):
@@ -136,6 +155,7 @@ def CB_msgPCL(msgPCL):
     sys.stdout.flush()
 
     DebugDumpMsgPCL(msgPCL)
+    #g_pcl_debug_pub.publish(msgPCL)
 
     # Extract pcl Raw from Ros msgPCL
     pclpcRawIn = pcl_helper.ros_to_pcl(msgPCL)
@@ -179,6 +199,7 @@ def RunRosNode():
 
     global g_pcl_sub
 
+    global g_pcl_debug_pub
     global g_pcl_objects_pub
     global g_pcl_table_pub
     global g_pcl_cluster_pub
@@ -194,12 +215,13 @@ def RunRosNode():
 
     # Create Subscribers
     #pclSrcNodeName = "/sensor_stick/point_cloud" # For Proj3 Exercise3 SensorStick
-    #pclSrcNodeName = "/pr2/world/points" # For Proj3 NOISE
-    pclSrcNodeName = "/camera/depth_registered/points" # For Proj3 NO NOISE
+    pclSrcNodeName = "/pr2/world/points" # For Proj3 NOISE
+    #pclSrcNodeName = "/camera/depth_registered/points" # For Proj3 NO NOISE
     #g_pcl_sub = rospy.Subscriber(pclSrcNodeName, pc2.PointCloud2, CB_msgPCL, queue_size=1)
     g_pcl_sub = rospy.Subscriber(pclSrcNodeName, pcl_helper.PointCloud2, CB_msgPCL, queue_size=1)
 
     # Create Publishers
+    g_pcl_debug_pub = rospy.Publisher("/pcl_debug", pcl_helper.PointCloud2, queue_size=1)
     g_pcl_objects_pub = rospy.Publisher("/pcl_objects", pcl_helper.PointCloud2, queue_size=1)
     g_pcl_table_pub = rospy.Publisher("/pcl_table", pcl_helper.PointCloud2, queue_size=1)
     g_pcl_cluster_pub = rospy.Publisher("/pcl_cluster", pcl_helper.PointCloud2, queue_size=1)

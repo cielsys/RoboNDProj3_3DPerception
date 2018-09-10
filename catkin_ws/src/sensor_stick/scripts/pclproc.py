@@ -16,7 +16,7 @@ import pcl_helper
 #====================== GLOBALS =====================
 
 # For testing only
-g_doTests = True
+g_doTests = False
 
 #----------------------- PlottingBackend_Switch()
 def PlottingBackend_Switch(whichBackEnd):
@@ -39,28 +39,33 @@ def PCLProc_DownSampleVoxels(pclpcIn):
     pclRecs = [(pclpcDownSampled, "pclpcDownSampled")]
     return pclRecs
 
-
-#----------------------- PCLProc_Ransac()
-def PCLProc_Ransac(pclpcIn):
+#----------------------- PCLProc_PassThrough()
+def PCLProc_PassThrough(pclpcIn, chAxis, min, max):
     pclRecs = [] # For dev/debug display. Container for point cloud records: tuple (pclObj, pclName)
 
     # Create a PassThrough filter object.
     filPassthrough = pclpcIn.make_passthrough_filter()
-
-    # Assign axis and range to the passthrough filter object.
-    filter_axis = 'z'
-    axis_min = 0.76
-    axis_max = 1.1
-    filPassthrough.set_filter_field_name(filter_axis)
-    filPassthrough.set_filter_limits(axis_min, axis_max)
+    filPassthrough.set_filter_field_name(chAxis)
+    filPassthrough.set_filter_limits(min, max)
 
     # Finally use the filter function to obtain the resultant point cloud.
-    pclpcPassZ = filPassthrough.filter()
-    pclRecs.append((pclpcPassZ, "pclpcPassZ"))
+    pclpcPass = filPassthrough.filter()
+    pclRecs.append((pclpcPass, "pclpcPass_" + chAxis))
 
-    # RANSAC plane segmentation
+    return pclRecs
+
+#----------------------- PCLProc_Ransac()
+def PCLProc_Ransac(pclpcIn):
+    """
+    RANSAC plane segmentation
+    :param pclpcIn:
+    :return:
+    """
+    pclRecs = [] # For dev/debug display. Container for point cloud records: tuple (pclObj, pclName)
+
+
     # Create the segmentation object
-    seg = pclpcPassZ.make_segmenter()
+    seg = pclpcIn.make_segmenter()
 
     # Set the model you wish to fit
     seg.set_model_type(pcl.SACMODEL_PLANE)
@@ -76,11 +81,11 @@ def PCLProc_Ransac(pclpcIn):
     inliers, coefficients = seg.segment()
 
     # Extract inliers
-    pclpcPassZIn = pclpcPassZ.extract(inliers, negative=False)
-    pclpcPassZOut = pclpcPassZ.extract(inliers, negative=True)
+    pclpcRansacInliers = pclpcIn.extract(inliers, negative=False)
+    pclpcRansacOutliers = pclpcIn.extract(inliers, negative=True)
 
-    pclRecs.append((pclpcPassZIn, "pclpcPassZIn"))
-    pclRecs.append((pclpcPassZOut, "pclpcPassZOut"))
+    pclRecs.append((pclpcRansacInliers, "pclpcRansacInliers"))
+    pclRecs.append((pclpcRansacOutliers, "pclpcRansacOutliers"))
 
     return(pclRecs)
 
@@ -88,9 +93,15 @@ def PCLProc_Ransac(pclpcIn):
 def PCLProc_Noise(pclpIn):
     pclRecs = [] # For dev/debug display. Container for point cloud records: tuple (pclObj, pclName)
 
+    print("pcl.__file__", pcl.__file__)
+    print("type pcl", type(pclpIn))
+
+    if (not type(pclpIn) is pcl._pcl.PointCloud):
+        pclpIn = pcl_helper.XYZRGB_to_XYZ(pclpIn)
+
     fil = pclpIn.make_statistical_outlier_filter()
     numNeighborsToCheck = 50
-    threshScaleFactor = 1.0
+    threshScaleFactor = 0.5
     fil.set_mean_k(numNeighborsToCheck)
     fil.set_std_dev_mul_thresh(threshScaleFactor)
 
