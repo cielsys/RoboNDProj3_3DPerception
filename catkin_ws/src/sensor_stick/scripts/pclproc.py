@@ -100,8 +100,8 @@ def PCLProc_Noise(pclpIn):
         pclpIn = pcl_helper.XYZRGB_to_XYZ(pclpIn)
 
     fil = pclpIn.make_statistical_outlier_filter()
-    numNeighborsToCheck = 50
-    threshScaleFactor = 0.5
+    numNeighborsToCheck = 25
+    threshScaleFactor = 1.0
     fil.set_mean_k(numNeighborsToCheck)
     fil.set_std_dev_mul_thresh(threshScaleFactor)
 
@@ -204,7 +204,7 @@ def rgb_to_hsv(rgb_list):
 
 
 #--------------------------------- PCLProc
-def compute_color_histograms(cloud, numBins=32, binRange=(0, 256), doConvertToHSV=True):
+def compute_color_histograms(cloud, numBins, binRange=(0, 256), doConvertToHSV=True):
     # Compute histograms for the clusters
     point_colors_list = []
 
@@ -246,7 +246,7 @@ def compute_color_histograms(cloud, numBins=32, binRange=(0, 256), doConvertToHS
 
 
 #--------------------------------- compute_normal_histograms
-def compute_normal_histograms(normal_cloud, numBins=32, binRange=(0, 256)):
+def compute_normal_histograms(normal_cloud, numBins, binRange=(0, 256)):
     norm_x_vals = []
     norm_y_vals = []
     norm_z_vals = []

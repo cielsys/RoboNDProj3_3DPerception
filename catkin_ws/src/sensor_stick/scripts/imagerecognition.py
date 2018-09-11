@@ -36,7 +36,7 @@ g_doTests = True
 g_doPlots = True
 
 #--------------------------------- ImgRecog_CalcHistogram()
-def ImgRecog_ExtractHistFeaturesFromImage(imgIn, numBins=32, binRange=(0, 256), doConvertToHSV=True):
+def ImgRecog_ExtractHistFeaturesFromImage(imgIn, numBins, binRange=(0, 256), doConvertToHSV=True):
     """
     Compute color histogram features
     :param img:
@@ -103,7 +103,7 @@ def ImgRecog_TrainSVC2DPointClusters(clustersX, clustersY, labels):
 
 
 #--------------------------------- ImgRecog_ExtractHistogramFeaturesFromImageFiles()
-def ImgRecog_ExtractHistFeaturesFromImageFiles(imageFileNames, numBins=32, binRange=(0, 256)):
+def ImgRecog_ExtractHistFeaturesFromImageFiles(imageFileNames, numBins, binRange=(0, 256)):
     """
     Extract features from a list of images
     """
@@ -121,7 +121,7 @@ def ImgRecog_ExtractHistFeaturesFromImageFiles(imageFileNames, numBins=32, binRa
 
 
 #--------------------------------- ImgRecog_TrainBinarySVCImageClassifier()
-def ImgRecog_TrainBinarySVCImageClassifier(carsFilenamesIn, notCarsFilenamesIn, numBins = 32, binRange=(0, 256)):
+def ImgRecog_TrainBinarySVCImageClassifier(carsFilenamesIn, notCarsFilenamesIn, numBins, binRange=(0, 256)):
     """
 
     :param carsFilenamesIn:

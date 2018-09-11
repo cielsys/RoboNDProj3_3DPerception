@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import sys
 import os
+import datetime
 import rospy
 
 # Ros package imports
@@ -19,7 +20,50 @@ from sensor_msgs.msg import PointCloud2
 
 # Local imports
 import pclproc
+import pcl_helper
 
+#====================== GLOBALS =====================
+g_trainingFileDir = "./Assets/Training/"
+g_numCapsDefault = 75
+g_modelSetName = "P3World1"
+
+g_numHistBinsHSV = 64
+g_numHistBinsNormals = 100
+
+g_numRetriesPerCapture = 3
+
+#--------------------------------- SelectModelNames()
+# /home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/RoboND-Perception-Project/pr2_robot/config/
+def SelectModelNames(modelSetName, numCapsDefault):
+
+    dictModelSetNames = {
+        "P3Exer3" : [('beer', numCapsDefault), ('bowl', numCapsDefault), ('create', numCapsDefault), ('disk_part', numCapsDefault), ('hammer', numCapsDefault), ('plastic_cup', numCapsDefault), ('soda_can', numCapsDefault)],
+        "P3World1": [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault)],
+        "P3World2": [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault),('book', numCapsDefault), ('glue', numCapsDefault)],
+        "P3World3": [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault),('book', numCapsDefault), ('glue', numCapsDefault), ('snacks', numCapsDefault),('eraser', numCapsDefault), ('sticky_notes', numCapsDefault)]
+    }
+    modelNames = dictModelSetNames[modelSetName]
+
+    return(modelNames)
+
+
+#--------------------------------- SelectModelNames()
+def GetTrainingSetName(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals):
+    strDT = "{:%Y-%m-%dT%H:%M:%S}".format(datetime.datetime.now())
+
+    trainingDirNameOut = g_trainingFileDir + modelSetName
+    trainingFileNameOut = trainingDirNameOut + "/{}_caps{}_colorbins{}_normalbin{}_{}.captures".format(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals, strDT)
+    return(trainingDirNameOut, trainingFileNameOut)
+
+# --------------------------------- SaveTrainingModel()
+def SaveTrainingModel(labeledFeaturesModelAccum, trainingFileNameOut):
+    print("Saving training set file {}".format(os.path.abspath(trainingFileNameOut)))
+    dirName = os.path.dirname(trainingFileNameOut)
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+    pickle.dump(labeledFeaturesModelAccum, open(trainingFileNameOut, 'wb'))
+
+#--------------------------------- get_normals()
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
     return get_normals_prox(cloud).cluster
@@ -34,7 +78,7 @@ def CaptureCloud(numRetriesPerCapture = 3):
         sys.stdout.flush()
 
         sample_cloud = capture_sample()
-        sample_cloud_arr = ros_to_pcl(sample_cloud).to_array()
+        sample_cloud_arr = pcl_helper.ros_to_pcl(sample_cloud).to_array()
 
         # Check for invalid clouds.
         if sample_cloud_arr.shape[0] == 0:
@@ -48,18 +92,19 @@ def CaptureCloud(numRetriesPerCapture = 3):
     return sample_was_good, sample_cloud
 
 #--------------------------------- CaptureFeaturesOfModel()
-def CaptureFeaturesOfModel(modelName, numCapturesReq, numRetriesPerCapture):
+def CaptureFeaturesOfModel(modelName, numCapturesReq, numHistBinsHSV, numHistBinsNormals):
     labeledFeaturesModel = []
     spawn_model(modelName)
+    numRetriesPerCapture = g_numRetriesPerCapture
 
     print('Capclouds({}):'.format(numCapturesReq)),
-    for i in range(numCapturesReq):
+    for index in range(numCapturesReq):
         sample_was_good, sample_cloud = CaptureCloud(numRetriesPerCapture)
         if (sample_was_good):
             # Extract histogram features
-            chists = pclproc.compute_color_histograms(sample_cloud, doConvertToHSV=True)
+            chists = pclproc.compute_color_histograms(sample_cloud, numHistBinsHSV, doConvertToHSV=True)
             normals = get_normals(sample_cloud)
-            nhists = pclproc.compute_normal_histograms(normals)
+            nhists = pclproc.compute_normal_histograms(normals, numHistBinsNormals)
 
             feature = np.concatenate((chists, nhists))
             labeledFeaturesModel.append([feature, modelName])
@@ -69,28 +114,77 @@ def CaptureFeaturesOfModel(modelName, numCapturesReq, numRetriesPerCapture):
 
 
 #--------------------------------- Test_ImgRec_CalHistogram()
-def CaptureFeaturesOfModelList(modelNames):
+def CaptureFeaturesOfModelList(modelNames, numHistBinsHSV, numHistBinsNormals):
     labeledFeaturesModelAccum = []
 
-    numRetriesPerCapture = 3
+
     for modelName, numCaps in modelNames:
         print ("CaptureFeatures({:11}):".format(modelName) ),
         sys.stdout.flush()
-        labeledFeaturesModel = CaptureFeaturesOfModel(modelName, numCaps, numRetriesPerCapture)
+        labeledFeaturesModel = CaptureFeaturesOfModel(modelName, numCaps, numHistBinsHSV, numHistBinsNormals)
         print " numCaptured = ", str(len(labeledFeaturesModel))
         labeledFeaturesModelAccum += labeledFeaturesModel
 
-    fileNameOut = 'training_set.sav'
-    print("Saving training set file {}".format(os.path.abspath(fileNameOut)))
-    pickle.dump(labeledFeaturesModelAccum, open(fileNameOut, 'wb'))
+    return labeledFeaturesModelAccum
 
 #--------------------------------- Main()
-def Main():
+def Main(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals):
     rospy.init_node('capture_node')
     initial_setup()# Disable gravity and delete the ground plane
     print("capture_features.py Main() started.")
-    modelNames = [('beer', 60), ('bowl', 60), ('create', 60), ('disk_part', 60), ('hammer', 60), ('plastic_cup', 60), ('soda_can', 60)]
-    CaptureFeaturesOfModelList(modelNames)
 
+    modelNames = SelectModelNames(modelSetName, numCapsDefault)
+    labeledFeaturesModelAccum = CaptureFeaturesOfModelList(modelNames, numHistBinsHSV, numHistBinsNormals)
+
+    trainingDirNameOut, trainingFileNameOut = GetTrainingSetName(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals)
+    SaveTrainingModel(labeledFeaturesModelAccum, trainingFileNameOut)
+
+#--------------------------------- Main() Invocation
 if __name__ == '__main__':
-    Main()
+    numCapsDefault = g_numCapsDefault
+    modelSetName = g_modelSetName
+    numHistBinsHSV = g_numHistBinsHSV
+    numHistBinsNormals = g_numHistBinsNormals
+
+    Main(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals)
+
+
+# object_list:
+#   - name: biscuits
+#     group: green
+#   - name: soap
+#     group: green
+#   - name: soap2
+#     group: red
+#         "P3World1" : [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault)]
+# object_list:
+#   - name: biscuits
+#     group: green
+#   - name: soap
+#     group: green
+#   - name: book
+#     group: red
+#   - name: soap2
+#     group: red
+#   - name: glue
+#     group: red
+#         "P3World2" : [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault), ('book', numCapsDefault), ('glue', numCapsDefault)],
+# object_list:
+#   - name: sticky_notes
+#     group: red
+#   - name: book
+#     group: red
+#   - name: snacks
+#     group: green
+#   - name: biscuits
+#     group: green
+#   - name: eraser
+#     group: red
+#   - name: soap2
+#     group: green
+#   - name: soap
+#     group: green
+#   - name: glue
+#     group: red
+#         "P3World3" : [('biscuits', numCapsDefault), ('soap', numCapsDefault), ('soap2', numCapsDefault), ('book', numCapsDefault), ('glue', numCapsDefault), ('snacks', numCapsDefault), ('eraser', numCapsDefault), ('sticky_notes', numCapsDefault)]
+

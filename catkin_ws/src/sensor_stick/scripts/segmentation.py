@@ -35,6 +35,16 @@ import pclproc
 
 #====================== GLOBALS =====================
 # Clearly this module wants to be a class
+g_callBackSkip =  5# How many callbacks to skip until actual processing. Default is 0
+g_callBackCount = -1
+
+g_numHistBinsHSV = 64
+g_numHistBinsNormals = 100
+
+g_classifierModelDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/'
+g_classifierModelFileNameBase =  "P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.clfModel"
+g_classifierModelFileName = g_classifierModelDir + g_classifierModelFileNameBase
+
 g_pcl_sub = None
 
 g_pcl_debug_pub = None
@@ -49,8 +59,7 @@ g_clf = None
 g_encoder = None
 g_scaler = None
 
-g_callBackCount = -1
-g_callBackSkip =  40# How many callbacks to skip until actual processing. Default is 0
+g_trainingRootDir = "./Assets/Training"
 
 # For debug testing only
 g_doRunRosNode = True # For invoking RunRosNode() when run from pycharm
@@ -106,8 +115,8 @@ def Process_rawPCL(pclpcRawIn):
 
     # Euclidean Clustering
     pclpObjectsNoColor = pcl_helper.XYZRGB_to_XYZ(pclpcObjects)
-    #clusterIndices, pclpcClusters = pclproc.PCLProc_ExtractClusters(pclpObjectsNoColor)
-    clusterIndices, pclpClusters = pclproc.PCLProc_ExtractClusters(pclpNoColorNoNoise)
+    clusterIndices, pclpClusters = pclproc.PCLProc_ExtractClusters(pclpObjectsNoColor)
+    #clusterIndices, pclpClusters = pclproc.PCLProc_ExtractClusters(pclpNoColorNoNoise)
 
     labelRecs = []
 
@@ -117,9 +126,9 @@ def Process_rawPCL(pclpcRawIn):
         msgPCL_cluster = pcl_helper.pcl_to_ros(pcl_cluster) # Needed for histograms... would refactor
 
         # Extract histogram features
-        chists = pclproc.compute_color_histograms(msgPCL_cluster, doConvertToHSV=True)
+        chists = pclproc.compute_color_histograms(msgPCL_cluster, g_numHistBinsHSV, doConvertToHSV=True)
         normals = get_normals(msgPCL_cluster)
-        nhists = pclproc.compute_normal_histograms(normals)
+        nhists = pclproc.compute_normal_histograms(normals, g_numHistBinsNormals)
         feature = np.concatenate((chists, nhists))
 
         # CLASSIFY, retrieve the label for the result
@@ -129,7 +138,7 @@ def Process_rawPCL(pclpcRawIn):
 
         # Accumulate label records for publishing (and labeling detected objects)
         label_pos = list(pclpcObjects[pts_list[0]])
-        #label_pos[2] += 0.3
+        label_pos[2] += 0.2
         labelRecs.append((label, label_pos, index))
 
     return labelRecs, pclpcObjects, pclpcTable, pclpClusters
@@ -229,7 +238,7 @@ def RunRosNode():
     g_detected_objects_pub = rospy.Publisher("/detected_objects", DetectedObjectsArray, queue_size=1)
 
     # Load Model From disk
-    g_model = pickle.load(open('model.sav', 'rb'))
+    g_model = pickle.load(open(g_classifierModelFileName, 'rb'))
     g_clf = g_model['classifier']
     g_encoder = LabelEncoder()
     g_encoder.classes_ = g_model['classes']
