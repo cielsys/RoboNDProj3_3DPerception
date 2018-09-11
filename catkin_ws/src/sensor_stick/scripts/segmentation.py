@@ -17,6 +17,9 @@ import rospy
 #import tf
 #from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 #from geometry_msgs.msg import Pose
+import geometry_msgs.msg as msgGeo
+import std_msgs.msg as msgStd
+
 import sensor_msgs.point_cloud2 as pc2
 from sensor_stick.srv import GetNormals
 
@@ -25,6 +28,8 @@ import sensor_stick.marker_tools as marker_tools
 from sensor_stick.msg import DetectedObjectsArray
 from sensor_stick.msg import DetectedObject
 from visualization_msgs.msg import Marker
+from rospy_message_converter import message_converter
+import yaml
 
 import pcl
 # Local imports
@@ -38,9 +43,14 @@ import pclproc
 g_callBackSkip =  5# How many callbacks to skip until actual processing. Default is 0
 g_callBackCount = -1
 
+g_WORLD_NUM  = 1
+
 g_numHistBinsHSV = 64
 g_numHistBinsNormals = 100
 
+g_assetsDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/'
+g_yamlOutDirName = g_assetsDir + 'yamlOut/'
+g_yamlOutFileName = g_yamlOutDirName + 'world_{}.yaml'.format(g_WORLD_NUM)
 g_classifierModelDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/'
 g_classifierModelFileNameBase =  "P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.clfModel"
 g_classifierModelFileName = g_classifierModelDir + g_classifierModelFileNameBase
@@ -59,9 +69,8 @@ g_clf = None
 g_encoder = None
 g_scaler = None
 
-g_trainingRootDir = "./Assets/Training"
-
 # For debug testing only
+g_doCommandRobot = False
 g_doRunRosNode = True # For invoking RunRosNode() when run from pycharm
 g_doTests = False # Invokes Test_Process_msgPCL() when file is run
 g_testmsgPCLFilename = "./Assets/msgPCL" # + "num..pypickle" # File containing a typical Ros msgPCL, used by doTests
@@ -139,9 +148,115 @@ def Process_rawPCL(pclpcRawIn):
         # Accumulate label records for publishing (and labeling detected objects)
         label_pos = list(pclpcObjects[pts_list[0]])
         label_pos[2] += 0.2
-        labelRecs.append((label, label_pos, index))
+        labelRecs.append((label, label_pos, index, pcl_cluster)) # Don't like passing pcl_cluster in this Records...
 
     return labelRecs, pclpcObjects, pclpcTable, pclpClusters
+
+# Helper function to create a yaml friendly dictionary from ROS messages
+#--------------------------------- pr2_mover()
+def make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose):
+    yaml_dict = {}
+    yaml_dict["test_scene_num"] = test_scene_num.data
+    yaml_dict["arm_name"]  = arm_name.data
+    yaml_dict["object_name"] = object_name.data
+    yaml_dict["pick_pose"] = message_converter.convert_ros_message_to_dictionary(pick_pose)
+    yaml_dict["place_pose"] = message_converter.convert_ros_message_to_dictionary(place_pose)
+    return yaml_dict
+
+# Helper function to output to yaml file
+#--------------------------------- pr2_mover()
+def send_to_yaml(fileNameOut, dict_list):
+    fileNameOutFQ = os.path.abspath(fileNameOut)
+    print("Saving output yaml file {}".format(fileNameOutFQ))
+    dirName = os.path.dirname(fileNameOutFQ)
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+
+    data_dict = {"object_list": dict_list}
+    with open(fileNameOutFQ, 'w') as outfile:
+        yaml.dump(data_dict, outfile, default_flow_style=False)
+
+# function to load parameters and request PickPlace service
+#--------------------------------- pr2_mover()
+def pr2_mover(detected_objects):
+    object_list = detected_objects
+
+    # TODO: Initialize variables
+    test_scene_num = msgStd.Int32()
+    arm_name = msgStd.String()
+    object_name = msgStd.String()
+    pick_pose = msgGeo.Pose()
+    place_pose = msgGeo.Pose()
+
+    test_scene_num.data = g_WORLD_NUM
+    detected = 0
+    dict_list = []
+
+    # TODO: Get/Read parameters
+    # get parameters
+    object_list_param = rospy.get_param('/object_list')
+    dropbox_param = rospy.get_param('/dropbox')
+
+    dictGroupColorToBoxParam = {}
+    for boxParam in dropbox_param:
+        groupColorStr = boxParam['group']
+        dictGroupColorToBoxParam[groupColorStr] = boxParam
+
+    # TODO: Loop through the pick list
+    for objIndex in range(0, len(object_list_param)):
+
+        # TODO: Parse parameters into individual variables
+        object_group = object_list_param[objIndex]['group']
+
+        # TODO: Get the PointCloud for a given object and obtain it's centroid
+        for object in object_list:
+            if object_list_param[objIndex]['name'] == object.label:
+                # labels.append(object.label)
+                points_arr = pcl_helper.ros_to_pcl(object.cloud).to_array()
+                centroids = np.mean(points_arr, axis=0)[:3]
+                pick_pose.position.x = np.asscalar(centroids[0])
+                pick_pose.position.y = np.asscalar(centroids[1])
+                pick_pose.position.z = np.asscalar(centroids[2])
+
+                object_name.data = object_list_param[objIndex]['name']
+
+                detected += 1
+                break
+
+        # TODO: Create 'place_pose' for the object
+        targetBox = dictGroupColorToBoxParam[object_group]
+        dropbox_pose =targetBox['position']
+        place_pose.position.x = dropbox_pose[0]
+        place_pose.position.y = dropbox_pose[1]
+        place_pose.position.z = dropbox_pose[2]
+
+        # TODO: Assign the arm to be used for pick_place
+        arm_name.data = targetBox['name']
+
+        # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
+        # Populate various ROS messages
+        yaml_dict = make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
+        dict_list.append(yaml_dict)
+
+
+        # TODO: Rotate PR2 in place to capture side tables for the collision map
+        if g_doCommandRobot:
+            try:
+                rospy.wait_for_service('pick_place_routine')
+                #pick_place_routine = rospy.ServiceProxy('pick_place_routine', PickPlace)
+
+                # TODO: Insert your message variables to be sent as a service request
+                #resp = pick_place_routine(g_WORLD_NUM, OBJECT_NAME, WHICH_ARM, PICK_POSE, PLACE_POSE)
+
+                #print ("Response: ",resp.success)
+
+            except rospy.ServiceException, e:
+                print "Service call failed: %s"%e
+
+    # TODO: Output your request parameters into output yaml file
+    send_to_yaml(g_yamlOutFileName, dict_list)
+    print("Detected: %s/%s" % (detected, len(object_list_param)))
+
 
 #--------------------------------- CB_msgPCL()
 def CB_msgPCL(msgPCL):
@@ -175,13 +290,13 @@ def CB_msgPCL(msgPCL):
     detected_objects_labels = [] # For ros loginfo only
     detected_objects = [] # For publish - for PROJ3!
 
-    for (labelText, labelPos, labelIndex) in labelRecs:
+    for (labelText, labelPos, labelIndex, pcl_cluster) in labelRecs:
         detected_objects_labels.append(labelText)
         g_object_markers_pub.publish(marker_tools.make_label(labelText, labelPos, labelIndex ))
         # Add  detected object to the list of detected objects.
         do = DetectedObject()
         do.label = labelText
-        do.cloud = pclpcClusters
+        do.cloud = pcl_helper.pcl_to_ros(pcl_cluster)
         detected_objects.append(do)
 
     rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
@@ -198,6 +313,13 @@ def CB_msgPCL(msgPCL):
     g_pcl_table_pub.publish(msgPCLTable)
     g_pcl_cluster_pub.publish(msgPCLClusters)
 
+    # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
+    # Could add some logic to determine whether or not your object detections are robust
+    # before calling pr2_mover()
+    try:
+        pr2_mover(detected_objects)
+    except rospy.ROSInterruptException:
+        pass
 
 #====================== Main() =====================
 def RunRosNode():

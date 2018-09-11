@@ -24,7 +24,7 @@ g_doValidation = True
 #--------------------------------- SaveClassifierModel()
 def SaveClassifierModel(classifierModel, classifierFileNameOut):
     classifierFileNameOutFQ = os.path.abspath(classifierFileNameOut)
-    print("Saving classifier modle file {}".format(classifierFileNameOutFQ))
+    print("Saving classifier model file {}".format(classifierFileNameOutFQ))
     dirName = os.path.dirname(classifierFileNameOutFQ)
     if not os.path.exists(dirName):
         os.makedirs(dirName)
