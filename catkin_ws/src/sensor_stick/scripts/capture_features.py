@@ -24,10 +24,10 @@ import pcl_helper
 
 #====================== GLOBALS =====================
 g_trainingFileDir = "./Assets/Training/"
-g_numCapsDefault = 75
-g_modelSetName = "P3World1"
+g_numCapsDefault = 200
+g_modelSetName = "P3World3"
 
-g_numHistBinsHSV = 64
+g_numHistBinsHSV = 96
 g_numHistBinsNormals = 100
 
 g_numRetriesPerCapture = 3
@@ -98,16 +98,19 @@ def CaptureFeaturesOfModel(modelName, numCapturesReq, numHistBinsHSV, numHistBin
     numRetriesPerCapture = g_numRetriesPerCapture
 
     print('Capclouds({}):'.format(numCapturesReq)),
-    for index in range(numCapturesReq):
+    for index in range(int(numCapturesReq)):
         sample_was_good, sample_cloud = CaptureCloud(numRetriesPerCapture)
         if (sample_was_good):
             # Extract histogram features
-            chists = pclproc.compute_color_histograms(sample_cloud, numHistBinsHSV, doConvertToHSV=True)
-            normals = get_normals(sample_cloud)
-            nhists = pclproc.compute_normal_histograms(normals, numHistBinsNormals)
+            try:
+                chists = pclproc.compute_color_histograms(sample_cloud, numHistBinsHSV, doConvertToHSV=True)
+                normals = get_normals(sample_cloud)
+                nhists = pclproc.compute_normal_histograms(normals, numHistBinsNormals)
 
-            feature = np.concatenate((chists, nhists))
-            labeledFeaturesModel.append([feature, modelName])
+                feature = np.concatenate((chists, nhists))
+                labeledFeaturesModel.append([feature, modelName])
+            except Exception as exc:
+                print ("Ignoring bad histogram...")
 
     delete_model()
     return labeledFeaturesModel

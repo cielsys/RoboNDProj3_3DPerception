@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # import subprocess
 import datetime
+import math
 import matplotlib
 import numpy as np
 import cv2
@@ -236,8 +237,11 @@ def compute_color_histograms(cloud, numBins, binRange=(0, 256), doConvertToHSV=T
     # Concatenate the histograms into a single feature vector
     histConsolidated = np.concatenate((histR[0], histG[0], histB[0])).astype(np.float64)
 
+    denom = np.sum(histConsolidated)
+    if (denom == 0 or math.isnan(denom)):
+        raise ZeroDivisionError("ColorHist")
     # Normalize the result
-    histNormedFeatures = histConsolidated / np.sum(histConsolidated)
+    histNormedFeatures = histConsolidated / denom
 
     # Generate random features for demo mode.
     # Replace normed_features with your feature vector
@@ -265,9 +269,12 @@ def compute_normal_histograms(normal_cloud, numBins, binRange=(0, 256)):
 
     # Concatenate the histograms into a single feature vector
     histConsolidated = np.concatenate((histR[0], histG[0], histB[0])).astype(np.float64)
+    denom = np.sum(histConsolidated)
+    if (denom == 0 or math.isnan(denom)):
+        raise ZeroDivisionError("NormalHist")
 
     # Normalize the result
-    histNormedFeatures = histConsolidated / np.sum(histConsolidated)
+    histNormedFeatures = histConsolidated / denom
 
     # Generate random features for demo mode.
     # Replace normed_features with your feature vector

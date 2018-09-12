@@ -40,20 +40,26 @@ import pclproc
 
 #====================== GLOBALS =====================
 # Clearly this module wants to be a class
-g_callBackSkip =  5# How many callbacks to skip until actual processing. Default is 0
+g_callBackSkip =  10 # How many callbacks to skip until actual processing. Default is 0
 g_callBackCount = -1
 
-g_WORLD_NUM  = 1
+g_WORLD_NUM  = 3
 
-g_numHistBinsHSV = 64
+g_numHistBinsHSV = 96
 g_numHistBinsNormals = 100
 
 g_assetsDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/'
 g_yamlOutDirName = g_assetsDir + 'yamlOut/'
 g_yamlOutFileName = g_yamlOutDirName + 'world_{}.yaml'.format(g_WORLD_NUM)
-g_classifierModelDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/'
-g_classifierModelFileNameBase =  "P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.clfModel"
-g_classifierModelFileName = g_classifierModelDir + g_classifierModelFileNameBase
+
+g_classifierModelFileNameBase =  "Training/P3World1/P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World2/P3World2_caps75_colorbins64_normalbin100_fitlinear_2018-09-11T15:02:20.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T19:55:14.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps90_colorbins96_normalbin128_fitlinear_2018-09-11T17:46:26.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps200_colorbins128_normalbin128_fitlinear_2018-09-11T20:02:20.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps200_colorbins96_normalbin100_fitlinear_2018-09-11T21:43:33.clfModel"
+
+g_classifierModelFileName = g_assetsDir + g_classifierModelFileNameBase
 
 g_pcl_sub = None
 
@@ -147,7 +153,7 @@ def Process_rawPCL(pclpcRawIn):
 
         # Accumulate label records for publishing (and labeling detected objects)
         label_pos = list(pclpcObjects[pts_list[0]])
-        label_pos[2] += 0.2
+        label_pos[2] += 0.3
         labelRecs.append((label, label_pos, index, pcl_cluster)) # Don't like passing pcl_cluster in this Records...
 
     return labelRecs, pclpcObjects, pclpcTable, pclpClusters

@@ -12,10 +12,15 @@ from sklearn import metrics
 import os
 
 #====================== GLOBALS =====================
-g_fitKernelType = 'linear'
+g_fitKernelType = 'linear' # linear, poly, rbf
 g_modelPickleversion = "1.0"
 
 g_trainingFileNameIn = "./Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbin100_2018-09-10T20:42:07.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbin100_2018-09-11T15:02:20.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps75_colorbins64_normalbin100_2018-09-10T19:55:14.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps90_colorbins96_normalbin128_2018-09-11T17:46:26.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps200_colorbins128_normalbin128_2018-09-11T20:02:20.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps200_colorbins96_normalbin100_2018-09-11T21:43:33.captures"
 
 g_doPlots = True
 g_doValidation = True
