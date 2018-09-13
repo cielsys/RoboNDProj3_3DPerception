@@ -1,38 +1,45 @@
-# Proj3: Perception Pick & Place
+# roboND Proj3: 3D Perception Pick & Place
 ### Submission writeup: ChrisL
 
 ---
+![RVizExer3](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_exer3_2018_09_07-13_10_40.png)
+<img src="ImagesOut/ImagesOut/pfig_2018-08-28T13:08:38_project_video_f0800.png" width="100%">
 
 
-# Required Steps for a Passing Submission:
-1. Extract features and train an SVM model on new objects (see `pick_list_*.yaml` in `/pr2_robot/config/` for the list of models you'll be trying to identify). 
-2. Write a ROS node and subscribe to `/pr2/world/points` topic. This topic contains noisy point cloud data that you must work with.
-3. Use filtering and RANSAC plane fitting to isolate the objects of interest from the rest of the scene.
-4. Apply Euclidean clustering to create separate clusters for individual items.
-5. Perform object recognition on these objects and assign them labels (markers in RViz).
-6. Calculate the centroid (average in x, y and z) of the set of points belonging to that each object.
-7. Create ROS messages containing the details of each object (name, pick_pose, etc.) and write these messages out to `.yaml` files, one for each of the 3 scenarios (`test1-3.world` in `/pr2_robot/worlds/`).  [See the example `output.yaml` for details on what the output should look like.](https://github.com/udacity/RoboND-Perception-Project/blob/master/pr2_robot/config/output.yaml)  
-8. Submit a link to your GitHub repo for the project or the Python code for your perception pipeline and your output `.yaml` files (3 `.yaml` files, one for each test world).  You must have correctly identified 100% of objects from `pick_list_1.yaml` for `test1.world`, 80% of items from `pick_list_2.yaml` for `test2.world` and 75% of items from `pick_list_3.yaml` in `test3.world`.
-9. Congratulations!  Your Done!
+<br/>
 
-# Extra Challenges: Complete the Pick & Place
-7. To create a collision map, publish a point cloud to the `/pr2/3d_map/points` topic and make sure you change the `point_cloud_topic` to `/pr2/3d_map/points` in `sensors.yaml` in the `/pr2_robot/config/` directory. This topic is read by Moveit!, which uses this point cloud input to generate a collision map, allowing the robot to plan its trajectory.  Keep in mind that later when you go to pick up an object, you must first remove it from this point cloud so it is removed from the collision map!
-8. Rotate the robot to generate collision map of table sides. This can be accomplished by publishing joint angle value(in radians) to `/pr2/world_joint_controller/command`
-9. Rotate the robot back to its original state.
-10. Create a ROS Client for the “pick_place_routine” rosservice.  In the required steps above, you already created the messages you need to use this service. Checkout the [PickPlace.srv](https://github.com/udacity/RoboND-Perception-Project/tree/master/pr2_robot/srv) file to find out what arguments you must pass to this service.
-11. If everything was done correctly, when you pass the appropriate messages to the `pick_place_routine` service, the selected arm will perform pick and place operation and display trajectory in the RViz window
-12. Place all the objects from your pick list in their respective dropoff box and you have completed the challenge!
-13. Looking for a bigger challenge?  Load up the `challenge.world` scenario and see if you can get your perception pipeline working there!
+## **Overview**
+Yet another fun but challenging assignment!
+The goals / steps of this project are the following:
+Using python in a ROS/Gazebo environment
 
-## [Rubric](https://review.udacity.com/#!/rubrics/1067/view) Points
+* Develop point cloud pre-processing tools for use in the following 3D perception pipeline
+    * Voxel downsampling
+    * Passthrough filtering for region-of-interest selection
+    * RANSAC table/objects segregation
+    * Noise reduction
+    * Euclidean clustering
+    * Extract object HSV and Normal histogram "features"
+    
+* Develop point cloud image recognition training tools to create an Suppor Vector Machine (SVM) object classifier
+    * Capture object point cloud data sets from ROS/gazebo world
+    * Extract object HSV and Normal histograms to use as feature data sets in SVM training
+    * Pass histogram feature datasets to a SVM  generator
+    * Serialize the generated SVM for later use in the pipeline
+    
+* Develop code to utilize the SVM object classifier to identify objects as the final step in the integrated 3D perception pipeline
+* Integrate the above tools into a ROS node to perform object recognition of objects in the ROS/Gazebo world
+* EXTRA: Command the PR-2 robot to move the recognized objects into the designated bins
+   
+### Note to Reviewer:
+My project structure is not 'standard'. To review the code or especially if you wish to attempt running the code
+please look over the Environment and Usage notes below first.
+
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
-### Writeup / README
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
-
-You're reading it!
+## Implementation
 
 ### Exercise 1, 2 and 3 pipeline implemented
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
@@ -42,18 +49,94 @@ You're reading it!
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
 Here is an example of how to include an image in your writeup.
 
-![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
-### Pick and Place Setup
 
 #### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
 
-And here's another image! 
-![demo-2](https://user-images.githubusercontent.com/20687560/28748286-9f65680e-7468-11e7-83dc-f1a32380b89c.png)
+## Discussion
+### 1. Problems I Encountered
+### 2. Improvements TODO
 
-Spend some time at the end to discuss your code, what techniques you used, what worked and why, where the implementation might fail and how you might improve it if you were going to pursue this project further.  
 
-### Links
+---
+
+## Notes
+### Environment Notes
+I developed this project in a native Mint18.3 linux environment (my laptop), not in the Ubuntu VM. 
+It was an ardous journey (see 'Problems I Encountered' above) and I suspect that my python/ROS
+environment is different enough from the Udacity VM that my code will not work in that enviroment
+without some effort. These notes and the usage notes may help, should one hope to attempt
+a run of this project. 
+
+#### Repo Directory Layout
+My repo layout differs from the (apparent) ROS project layout convention. The repo root (".")  is not the usual
+"catkin_ws/src" folder but above that. It contains "./catkin_ws" and "./catkin_ws/src", the conventional
+repo root within it. However "./catkin_ws/devel" and "./catkin_ws/build" are excluded from the repo.
+See 'Usage Notes' below to recreate the catkin workspace. <br/>
+
+**Important Directories and files**
+* ./catkin_ws/src/RoboND-Perception-Project/ <br/>
+This folder contains the [roboND Proj3 Template repo](https://github.com/udacity/RoboND-Perception-Project)
+as code, not a git sub module, as is, without modifications except <br/>
+```./catkin_ws/src/RoboND-Perception-Project/pr2_robot/launch/pick_place_project.launch```
+as needed for selecting the different worlds.
+
+* ```./catkin_ws/src/sensor_stick``` and ```./catkin_ws/src/sensor_stick/scripts```
+These directories are grafted from my exercises repo and are the location of my project 3 code. In particular
+    * [segmentation.py](./catkin_ws/src/sensor_stick/scripts/segmentation.py)<br/>
+    This is the "main" project file that implements the ROS node processing and that invokes the point cloud
+    processing and image recognition and publishes the various ROS topics and outputs the yaml files.
+
+    * [pclproc.py](./catkin_ws/src/sensor_stick/scripts/pclproc.py)<br/>
+    This file contains the pcl processing functions that comprise point cloud processing functions.
+ 
+     * [capture_features.py](./catkin_ws/src/sensor_stick/scripts/capture_features.py)<br/>
+     My (modified) code for acquiring object pointclouds and saving histogram feature sets 
+     to be used by the training module.
+
+     * [train_svm.py](./catkin_ws/src/sensor_stick/scripts/train_svm.py)<br/>
+     My (modified) code for consuming the object feature sets and creating and serializing an SVM classifier
+     
+     * [Assets](./catkin_ws/src/sensor_stick/scripts/Assets)<br/>
+     Contains a variety of input and output files, including the SVM classifiers
+     
+     * ```./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut```<br/>
+     Contains the final output files:<br/>
+     [yaml 1](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_1_keep.yaml)<br/>
+     [yaml 2](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_2_keep.yaml)<br/>
+     [yaml 3](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_3_6of8.yaml)<br/>
+     
+
+### Usage Notes
+ and must be created with ```./catkin_ws> catkin_make```
+
+### Acknowledgements
+Most of my code is adapted from code presented in the lessons.
+However I have used code from other projects: <br/>
+
+Due to "Problems I Encountered" (see above), I visited several repos of other students
+to help me resolve the problems. I did not keep a list of all of those repos but this one
+[Helpful debug repo from another student](https://github.com/prasanjit6485/RoboND-PerceptionProject.git)<br/>
+in particular was very helpful in resolution of my problems. 
+
+
+I incorporated some
+of his ```def pr2_mover(object_list):``` code in my own to get things working. 
+I made and effort to rewrite the code that didn't originate from the lessons 
+but there is likely some 'residue' of his code in my own. 
+I also compared final yaml output files to confirm correctness. 
+I have sent an [email](prasanjit6485@gmail.com) to Prasnjit to acknowledge and thank
+him.
+
+## Links
+[My roboND Project 3](https://github.com/cielsys/RoboNDProj3_3DPerception)
+This, my main project 3 repo
+
+[roboND Proj3 Exercises1,2,3 Repo](https://github.com/cielsys/RoboNDProj3_Exercises)
+This repo contains the code I developed for the point cloud preprocessing steps. It is **now obsolete**
+as the code was integrated into and modified, in many cases, in the main project 3 repo 
+
+[roboND Proj3 Template repo](https://github.com/udacity/RoboND-Perception-Project)
 
 [Rubric](https://review.udacity.com/#!/rubrics/1067/view) 
 
