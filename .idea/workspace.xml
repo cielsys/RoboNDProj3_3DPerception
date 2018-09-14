@@ -36,13 +36,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="19" />
-          <entry key="md" value="10210" />
+          <entry key="md" value="10236" />
           <entry key="py" value="3634" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Markdown" value="10210" />
+          <entry key="Markdown" value="10236" />
           <entry key="Python" value="3653" />
         </counts>
       </usages-collector>
@@ -92,8 +92,8 @@
             <entry file="file://$PROJECT_DIR$/writeup.md">
               <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
                 <state split_layout="SPLIT">
-                  <first_editor relative-caret-position="486">
-                    <caret line="99" column="18" selection-start-line="99" selection-start-column="18" selection-end-line="99" selection-end-column="18" />
+                  <first_editor relative-caret-position="72">
+                    <caret line="7" selection-start-line="7" selection-end-line="7" />
                   </first_editor>
                   <second_editor />
                 </state>
@@ -767,8 +767,8 @@
     <entry file="file://$PROJECT_DIR$/writeup.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="486">
-            <caret line="99" column="18" selection-start-line="99" selection-start-column="18" selection-end-line="99" selection-end-column="18" />
+          <first_editor relative-caret-position="72">
+            <caret line="7" selection-start-line="7" selection-end-line="7" />
           </first_editor>
           <second_editor />
         </state>

@@ -3,8 +3,7 @@
 
 ---
 
-<img src="ImagesOut/ImagesOut/pfig_2018-08-28T13:08:38_project_video_f0800.png" width="100%">
-
+![ExerciseWorld](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_exer3_2018_09_07-13_10_40.png)
 
 <br/>
 
@@ -97,7 +96,6 @@ I was eventually able to get a good confusion matrix even for world3.
 After great effort I was able to get world3 to recognize 6 of 8 objects. The glue was never going to happen.
 And I think I pretty much understood everything that is going on! I would have
 kept working on this project (and this writeup) but... I'm already late and falling behind the next projects
-so I must move on.
 
 ### 1. Problems I Encountered
 TIME!
