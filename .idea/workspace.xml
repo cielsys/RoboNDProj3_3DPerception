@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d80c82fb-e480-419a-a5e7-d2f3988fd2a9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/writeup.md" beforeDir="false" afterPath="$PROJECT_DIR$/writeup.md" afterDir="false" />
-    </list>
+    <list default="true" id="d80c82fb-e480-419a-a5e7-d2f3988fd2a9" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,7 +12,7 @@
     <session id="1586394896">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.22" value="1" />
           <entry key="project.open.time.31" value="1" />
@@ -481,7 +479,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="3060" y="142" width="2700" height="2018" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49908257" visible="true" weight="0.111696124" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -489,7 +486,7 @@
       <window_info anchor="bottom" id="Messages" order="0" />
       <window_info anchor="bottom" id="Message" order="1" />
       <window_info anchor="bottom" id="Find" order="2" weight="0.28622088" />
-      <window_info anchor="bottom" id="Run" order="3" sideWeight="0.49981195" visible="true" weight="0.18504366" />
+      <window_info anchor="bottom" id="Run" order="3" sideWeight="0.49981195" weight="0.18504366" />
       <window_info anchor="bottom" id="Debug" order="4" weight="0.31914893" />
       <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
@@ -497,7 +494,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32960564" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="11" sideWeight="0.50018805" side_tool="true" visible="true" weight="0.18504366" />
+      <window_info anchor="bottom" id="Python Console" order="11" sideWeight="0.50018805" side_tool="true" visible="true" weight="0.17139737" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />

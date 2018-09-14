@@ -31,4 +31,4 @@ rosrun pr2_robot pr2_motion
 # Main Proj3
 roslaunch pr2_robot pick_place_project.launch & 
 rosrun pr2_robot segmentation.py &
-rosrun pr2_robot p3main.py
+
