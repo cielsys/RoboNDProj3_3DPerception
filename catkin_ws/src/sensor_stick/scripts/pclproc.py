@@ -17,7 +17,7 @@ import pcl_helper
 #====================== GLOBALS =====================
 
 # For testing only
-g_doTests = False
+g_doTests = True
 
 #----------------------- PlottingBackend_Switch()
 def PlottingBackend_Switch(whichBackEnd):
@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 def PCLProc_DownSampleVoxels(pclpcIn):
     # Create a VoxelGrid filter object for our input point cloud
     vox = pclpcIn.make_voxel_grid_filter()
-    voxelSize = 0.01
+    voxelSize = 0.005
     vox.set_leaf_size(voxelSize, voxelSize, voxelSize)
     # Call the filter function to obtain the resultant downsampled point cloud
     pclpcDownSampled = vox.filter()
@@ -101,8 +101,8 @@ def PCLProc_Noise(pclpIn):
         pclpIn = pcl_helper.XYZRGB_to_XYZ(pclpIn)
 
     fil = pclpIn.make_statistical_outlier_filter()
-    numNeighborsToCheck = 25
-    threshScaleFactor = 1.0
+    numNeighborsToCheck = 20
+    threshScaleFactor = 1
     fil.set_mean_k(numNeighborsToCheck)
     fil.set_std_dev_mul_thresh(threshScaleFactor)
 
@@ -173,7 +173,7 @@ def PCLProc_ExtractClusters(pclpObjectsIn):
     # Set tolerances for distance threshold & clusterSize min,max (in points)
     clusterExtractor.set_ClusterTolerance(0.015)
     clusterExtractor.set_MinClusterSize(120)
-    clusterExtractor.set_MaxClusterSize(1500)
+    clusterExtractor.set_MaxClusterSize(4000)
 
     # Search the k-d tree for clusters
     clusterExtractor.set_SearchMethod(kdTreeCluster)
@@ -250,7 +250,7 @@ def compute_color_histograms(cloud, numBins, binRange=(0, 256), doConvertToHSV=T
 
 
 #--------------------------------- compute_normal_histograms
-def compute_normal_histograms(normal_cloud, numBins, binRange=(0, 256)):
+def compute_normal_histograms(normal_cloud, numBins, binRange=(-1.0, 1.0)):
     norm_x_vals = []
     norm_y_vals = []
     norm_z_vals = []

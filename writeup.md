@@ -1,5 +1,12 @@
 # roboND Proj3: 3D Perception Pick & Place
 ### Submission writeup: ChrisL 2018-10-13
+Resubmision 2018-10-14. Addressed the follwing review notes.<br/>
+* Fixed compute_normal_histograms() bin range to (-1.0, 1.0)
+* Added confusion matrix images, though these were present before. The new
+confusion matrices with the normals appear worse, but the classifiers still work well enough.
+* Added labeled objects images for each world.
+Additonally
+* Added images for various steps of the point cloud preprocessing 
 
 ---
 
@@ -33,13 +40,25 @@ Using python in a ROS/Gazebo environment:
 ### Note to Reviewer:
 My project structure is not 'standard'. To review the code or especially if you wish to attempt running the code
 please look over the Environment and Usage notes below first.<br/>
+
 **Final Output Files:**
 [yaml 1](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_1_keep.yaml)
 [yaml 2](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_2_keep.yaml)
 [yaml 3](./catkin_ws/src/sensor_stick/scripts/Assets/yamlOut/world_3_6of8.yaml)
 
 ---
-![World3](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_world3_2018_09_11-18_06_27.png)
+**Final Output Image Captures**
+
+
+**World 1: 3 of 3 Labeled Objects**
+![World1](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_screenshot_2018_09_14-16_19_43.png)
+
+**World 2: 4 of 5 Labeled Objects**
+![World2](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_screenshot_2018_09_14-16_17_13.png)
+
+**World 3: 7 of 8 Labeled Objects**
+![World3](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_screenshot_2018_09_14-16_02_24.png)
+
 ## Implementation
 This is a summary of the overall flow of the project. Additional details are 
 described in "**Important Directories and files**" below.
@@ -63,10 +82,33 @@ the returned values.
 * Performs the point cloud preprocessing pipeline by invoking
     * PCLProc_DownSampleVoxels(pclpcRawIn)
     * PCLProc_PassThrough(pclpcDownSampled, 'z', 0.6, 1.1) & PCLProc_PassThrough(pclpcPassZ, 'y', -0.5, 0.5)
+    Removes the floor and the side tables.
     * PCLProc_Ransac(pclpcPassY)
+    Segregates the table from the objects.
+   
+ 
+RANSAC Table   
+![RansacTable](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/table_rviz_screenshot_2018_09_14-16_24_41.png)
+
+
+RANSAC Objects
+
+![RansacObjects](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/objects_rviz_screenshot_2018_09_14-16_25_23.png)  
+
     * PCLProc_Noise(pclpcObjects)
+    Removes noise voxels. I found this to actually harm my recogntion, so I left it out. Here is the 
+    objects with noise removed.
+ 
+Noise removal   
+![Noise](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/rviz_screenshot_2018_09_14-16_07_00.png)  
+
     * PCLProc_ExtractClusters(pclpObjectsNoColor)
-    
+    Uses euclidean clustering to segregate the objects point cloud into individual object point clouds
+
+Euclidean Clustering
+![Cluster](./catkin_ws/src/sensor_stick/scripts/Assets/imagesWriteup/cluster_rviz_screenshot_2018_09_14-16_26_20.png)  
+ 
+   
 * Performs SVM object recognition on each cluster
     * Extracts features with  compute_color_histograms() & compute_normal_histograms()
     * Identifies/labels the object from the features using the SVM classifier g_clf.predict()
@@ -87,13 +129,28 @@ The main program needs to load a serialized SVM classifier object such as
 ```/catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.clfModel```
 that corresponds to the world at hand. There are a variety of these classifiers that were generated for each world using<br/>
 [train_svm.py](./catkin_ws/src/sensor_stick/scripts/train_svm.py)<br/>
-I was eventually able to get a good confusion matrix even for world3.
+I was eventually able to get a good confusion matrix even by trial and error. 
+I found that the rate of classification improvement started to plateau at about 300 captures.
+After fixing my normal histogram bin limits I found the classification accuracy decreased.
+Honestly, I expect it. With the random orientations I expect every object to provide
+histograms all over the map. In any case I fixed the normal histograms as requested and they didn't do
+much harm to the final classifications.
+
+**New Confusion Matrices**
+
+![World1](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbins48_fitlinear_2018-09-14T12:58:02.confusion.png)
+![World2](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbins8_fitlinear_2018-09-14T11:10:39.confusion.png)
+![World3](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World3/P3World3_caps200_colorbins64_normalbins10_fitlinear_2018-09-14T14:27:52.confusion.png)
+
+
+**Old Confusion Matrices**
+
 ![World1](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T20:42:07.confusion.png)
 ![World2](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbin100_2018-09-11T15:02:20.confusion.png)
 ![World3](./catkin_ws/src/sensor_stick/scripts/Assets/Training/P3World3/P3World3_caps200_colorbins96_normalbin100_2018-09-11T21:43:33.confusion.png)
 
 ## Discussion
-After great effort I was able to get world3 to recognize 6 of 8 objects. The glue was never going to happen.
+7 of 8 objects. The glue was never going to happen.
 And I think I pretty much understood everything that is going on! I would have
 kept working on this project (and this writeup) but... I'm already late and falling behind the next projects
 
@@ -104,19 +161,19 @@ use my existing linux system, has caused me literally days and days of frustrati
 When I finally get around to actual coding, time is short.
 
 I had a very difficult time getting the python_pcl library to work as described. Literally days were
-wasted. I eventually resorted to installing and configuring the VM, whcih itself was a difficult
+wasted. I eventually resorted to installing and configuring the VM, which itself was a difficult
 task, and using another students solution to confirm that the environment could work at all.
 Once I had a known working environment I was able to narrow down discrepancies between my python environment
 and the VM environment. And using the sample project back in my environement I was able get the
 code to import and run, and then I was able to restore all of my own code.
 It is too bad that ROS is incompatible with Conda.
 
-Training test was a laborious effort. I had several world-3 trainings that would work well enough.
+Training test sets was a laborious effort. I had several world-3 trainings that would work well enough.
 
 
 ### 2. Improvements TODO
 **Use the noise filter.**
-In the end I didn't use the noise filter. The clusting seemed to work well enough with an excessively trained SVM.
+In the end I didn't use the noise filter. The clustering worked better without it.
 
 **Tune the Point cloud pre-process to isolate the glue**
 I was not able to recognize the occluded glue. I don't see how it would be possible

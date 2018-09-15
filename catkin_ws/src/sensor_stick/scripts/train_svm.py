@@ -15,12 +15,16 @@ import os
 g_fitKernelType = 'linear' # linear, poly, rbf
 g_modelPickleversion = "1.0"
 
-g_trainingFileNameIn = "./Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbin100_2018-09-10T20:42:07.captures"
 g_trainingFileNameIn = "./Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbin100_2018-09-11T15:02:20.captures"
 g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps75_colorbins64_normalbin100_2018-09-10T19:55:14.captures"
 g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps90_colorbins96_normalbin128_2018-09-11T17:46:26.captures"
 g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps200_colorbins128_normalbin128_2018-09-11T20:02:20.captures"
 g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps200_colorbins96_normalbin100_2018-09-11T21:43:33.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbins16_2018-09-14T10:45:11.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbins16_2018-09-14T10:59:11.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World1/P3World1_caps75_colorbins64_normalbins48_2018-09-14T12:58:02.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World3/P3World3_caps200_colorbins64_normalbins10_2018-09-14T14:27:52.captures"
+g_trainingFileNameIn = "./Assets/Training/P3World2/P3World2_caps75_colorbins64_normalbins8_2018-09-14T11:10:39.captures"
 
 g_doPlots = True
 g_doValidation = True
@@ -41,8 +45,8 @@ def GetTrainingSetName():
     return(trainingFileNameIn)
 
 #--------------------------------- SaveClassifierModel()
-def GetClassifierFileNameFromTrainingFileName(trainingFileNameIn):
-    extOut = '.clfModel'
+def GetClassifierFileNameFromTrainingFileName(trainingFileNameIn, extOut = '.clfModel'):
+
     trainingFileNameInNoExt = os.path.splitext(trainingFileNameIn)[0]
     suffixTemplate = "_2018-09-10T20:42:07"
     suffixLen = len(suffixTemplate)
@@ -58,7 +62,7 @@ def MainTrain(fitKernelType, trainingSetFileNameIn):
     print("Reading training set {}".format(trainingSetFileNameInFQ))
 
     # Load training data from disk
-    trainingSet = pickle.load(open(trainingSetName, 'rb'))
+    trainingSet = pickle.load(open(trainingSetFileNameIn, 'rb'))
 
     # Format the features and labels for use with scikit learn
     feature_list = []
@@ -130,8 +134,8 @@ def plot_confusion_matrix(cm, classes,normalize=False, title='Confusion matrix',
     cbar = plt.colorbar(cax=cax)
 
     plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-
+    #plt.xlabel('Predicted label', )
+    ax.set_xlabel('Predicted label', labelpad = 20)
     plt.tight_layout()
 
 
@@ -164,27 +168,37 @@ def Validate(trainingParams, classifierModel):
     if g_doPlots:
         plotTitle = os.path.basename(GetClassifierFileNameFromTrainingFileName(classifierModel['trainingSetFileNameIn']))
 
-        plt.figure()
+        plt.figure(figsize=(10, 6))
+        plt.figtext(0.5, 0.90, 'Confusion matrix', ha='center', va='top', fontsize=16)
         # Plot non-normalized confusion matrix
 
         plt.subplot(121)
-        plot_confusion_matrix(confusion_matrix, classes= encoderclasses, title='Confusion matrix, without normalization')
+        plot_confusion_matrix(confusion_matrix, classes= encoderclasses, title='Not normalized')
 
         # Plot normalized confusion matrix
         plt.subplot(122)
-        plot_confusion_matrix(confusion_matrix, classes= encoderclasses, normalize=True, title='Normalized confusion matrix')
+        plot_confusion_matrix(confusion_matrix, classes= encoderclasses, normalize=True, title='Normalized')
 
-        plt.suptitle(plotTitle, fontsize=20)
-        plt.subplots_adjust(left=0.05, right=0.95, top=0.95)# wspace=0.95,
+        plt.suptitle(plotTitle, fontsize=16)
+
+        plt.subplots_adjust(left=0.1, right=0.90, top=0.95)# wspace=0.95,
+
+        figFileNameExt = ".confusion.png"
+        figFileNameOut = GetClassifierFileNameFromTrainingFileName(classifierModel['trainingSetFileNameIn'], figFileNameExt)
+        plt.savefig(figFileNameOut)
+
         plt.show()
 
-
-#====================== Main Invocation RunRosNode() =====================
-if (__name__ == '__main__'):
-    trainingSetName = g_trainingFileNameIn
-    trainingParams, classifierModel = MainTrain(g_fitKernelType, trainingSetName)
+# --------------------------------- Main()
+def Main(trainingSetFileNameIn):
+    trainingParams, classifierModel = MainTrain(g_fitKernelType, trainingSetFileNameIn)
     clasifierFileNameOut = GetClassifierFileNameFromTrainingFileName(g_trainingFileNameIn)
     SaveClassifierModel(classifierModel, clasifierFileNameOut)
 
     if g_doValidation:
         Validate(trainingParams, classifierModel)
+
+
+#====================== Main Invocation RunRosNode() =====================
+if (__name__ == '__main__'):
+    Main(g_trainingFileNameIn)

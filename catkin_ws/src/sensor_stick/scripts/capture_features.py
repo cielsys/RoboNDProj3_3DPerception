@@ -21,16 +21,19 @@ from sensor_msgs.msg import PointCloud2
 # Local imports
 import pclproc
 import pcl_helper
+import train_svm
 
 #====================== GLOBALS =====================
 g_trainingFileDir = "./Assets/Training/"
 g_numCapsDefault = 200
 g_modelSetName = "P3World3"
 
-g_numHistBinsHSV = 96
-g_numHistBinsNormals = 100
+g_numHistBinsHSV = 64
+g_numHistBinsNormals = 48
 
 g_numRetriesPerCapture = 3
+
+g_doTraining = True
 
 #--------------------------------- SelectModelNames()
 # /home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/RoboND-Perception-Project/pr2_robot/config/
@@ -52,7 +55,7 @@ def GetTrainingSetName(modelSetName, numCapsDefault, numHistBinsHSV, numHistBins
     strDT = "{:%Y-%m-%dT%H:%M:%S}".format(datetime.datetime.now())
 
     trainingDirNameOut = g_trainingFileDir + modelSetName
-    trainingFileNameOut = trainingDirNameOut + "/{}_caps{}_colorbins{}_normalbin{}_{}.captures".format(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals, strDT)
+    trainingFileNameOut = trainingDirNameOut + "/{}_caps{}_colorbins{}_normalbins{}_{}.captures".format(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals, strDT)
     return(trainingDirNameOut, trainingFileNameOut)
 
 # --------------------------------- SaveTrainingModel()
@@ -74,22 +77,16 @@ def CaptureCloud(numRetriesPerCapture = 3):
     sample_was_good = False
 
     while not sample_was_good and try_count < numRetriesPerCapture:
-        print(str(try_count)),
-        sys.stdout.flush()
-
         sample_cloud = capture_sample()
         sample_cloud_arr = pcl_helper.ros_to_pcl(sample_cloud).to_array()
 
         # Check for invalid clouds.
         if sample_cloud_arr.shape[0] == 0:
-            print('*BAD,'),
             try_count += 1
         else:
-            print('good,'),
             sample_was_good = True
-        sys.stdout.flush()
 
-    return sample_was_good, sample_cloud
+    return try_count, sample_was_good, sample_cloud
 
 #--------------------------------- CaptureFeaturesOfModel()
 def CaptureFeaturesOfModel(modelName, numCapturesReq, numHistBinsHSV, numHistBinsNormals):
@@ -97,9 +94,10 @@ def CaptureFeaturesOfModel(modelName, numCapturesReq, numHistBinsHSV, numHistBin
     spawn_model(modelName)
     numRetriesPerCapture = g_numRetriesPerCapture
 
-    print('Capclouds({}):'.format(numCapturesReq)),
-    for index in range(int(numCapturesReq)):
-        sample_was_good, sample_cloud = CaptureCloud(numRetriesPerCapture)
+    for capIndex in range(int(numCapturesReq)):
+        try_count, sample_was_good, sample_cloud = CaptureCloud(numRetriesPerCapture)
+        print('\rCapturePCLFeatures({} {}/{})({} tries)'.format(modelName, capIndex+1, numCapturesReq, try_count+1)),
+        sys.stdout.flush()
         if (sample_was_good):
             # Extract histogram features
             try:
@@ -120,10 +118,7 @@ def CaptureFeaturesOfModel(modelName, numCapturesReq, numHistBinsHSV, numHistBin
 def CaptureFeaturesOfModelList(modelNames, numHistBinsHSV, numHistBinsNormals):
     labeledFeaturesModelAccum = []
 
-
     for modelName, numCaps in modelNames:
-        print ("CaptureFeatures({:11}):".format(modelName) ),
-        sys.stdout.flush()
         labeledFeaturesModel = CaptureFeaturesOfModel(modelName, numCaps, numHistBinsHSV, numHistBinsNormals)
         print " numCaptured = ", str(len(labeledFeaturesModel))
         labeledFeaturesModelAccum += labeledFeaturesModel
@@ -134,13 +129,18 @@ def CaptureFeaturesOfModelList(modelNames, numHistBinsHSV, numHistBinsNormals):
 def Main(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals):
     rospy.init_node('capture_node')
     initial_setup()# Disable gravity and delete the ground plane
-    print("capture_features.py Main() started.")
+    print("capture_features.py Main() started."),
 
     modelNames = SelectModelNames(modelSetName, numCapsDefault)
+    modelNamesStr = ", ".join([name for (name, capCout) in modelNames])
+    print("model set = [{}]".format(modelNamesStr))
+
     labeledFeaturesModelAccum = CaptureFeaturesOfModelList(modelNames, numHistBinsHSV, numHistBinsNormals)
 
     trainingDirNameOut, trainingFileNameOut = GetTrainingSetName(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals)
     SaveTrainingModel(labeledFeaturesModelAccum, trainingFileNameOut)
+    if (g_doTraining):
+        train_svm.Main(trainingFileNameOut)
 
 #--------------------------------- Main() Invocation
 if __name__ == '__main__':
@@ -150,8 +150,6 @@ if __name__ == '__main__':
     numHistBinsNormals = g_numHistBinsNormals
 
     Main(modelSetName, numCapsDefault, numHistBinsHSV, numHistBinsNormals)
-
-
 # object_list:
 #   - name: biscuits
 #     group: green

@@ -45,8 +45,8 @@ g_callBackCount = -1
 
 g_WORLD_NUM  = 3
 
-g_numHistBinsHSV = 96
-g_numHistBinsNormals = 100
+g_numHistBinsHSV = 64
+g_numHistBinsNormals = 8
 
 g_assetsDir = '/home/cl/AAAProjects/AAAUdacity/roboND/Proj3_3dPerception/Proj3_Root/catkin_ws/src/sensor_stick/scripts/Assets/'
 g_yamlOutDirName = g_assetsDir + 'yamlOut/'
@@ -57,7 +57,9 @@ g_classifierModelFileNameBase =  "Training/P3World2/P3World2_caps75_colorbins64_
 g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps75_colorbins64_normalbin100_fitlinear_2018-09-10T19:55:14.clfModel"
 g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps90_colorbins96_normalbin128_fitlinear_2018-09-11T17:46:26.clfModel"
 g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps200_colorbins128_normalbin128_fitlinear_2018-09-11T20:02:20.clfModel"
-g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps200_colorbins96_normalbin100_fitlinear_2018-09-11T21:43:33.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World3/P3World3_caps200_colorbins64_normalbins10_fitlinear_2018-09-14T14:27:52.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World2/P3World2_caps75_colorbins64_normalbin100_fitlinear_2018-09-11T15:02:20.clfModel"
+g_classifierModelFileNameBase =  "Training/P3World2/P3World2_caps75_colorbins64_normalbins8_fitlinear_2018-09-14T11:10:39.clfModel"
 
 g_classifierModelFileName = g_assetsDir + g_classifierModelFileNameBase
 
@@ -153,7 +155,8 @@ def Process_rawPCL(pclpcRawIn):
 
         # Accumulate label records for publishing (and labeling detected objects)
         label_pos = list(pclpcObjects[pts_list[0]])
-        label_pos[2] += 0.3
+        label_pos[0] -= 0.1
+        label_pos[2] += 0.2
         labelRecs.append((label, label_pos, index, pcl_cluster)) # Don't like passing pcl_cluster in this Records...
 
     return labelRecs, pclpcObjects, pclpcTable, pclpClusters
